@@ -141,6 +141,13 @@ function loadHandlers() {
         }, 150);
     }
 
+		// function clearOptions() {
+  //   		api.storage.local.clear().then(() => {
+  //       		api.runtime.sendMessage({ tmn: "resetSettings" });
+  //       		getStorage(["engines_tmn","options_tmn"], TMNLoadOptionWindow);
+  //   		});
+		// }
+//Use the Promise returned by the API.
       function addEngine(param) {
 
         var new_engine = {};
@@ -207,14 +214,16 @@ function TMNHideQueries() {
 
 function TMNShowLog(items) {
     var logs = items.logs_tmn;
-    var htmlStr = '<table cellspacing=3 id="overlaytext" width="800px" position="relative">';
-    htmlStr += '<thead><tr align=left>';
-    htmlStr += '<th>Engine</th>';
-    htmlStr += '<th>Mode</th>';
-    htmlStr += '<th>URL</th>';
-    htmlStr += '<th>Query/Message</th>';
-    htmlStr += '<th>Date</th>';
-    htmlStr += '</tr></thead>';
+ //    var htmlStr = '<table cellspacing=3 id="overlaytext" width="800px" position="relative">';
+ //    htmlStr += '<thead><tr align=left>';
+ //    htmlStr += '<th>Engine</th>';
+ //    htmlStr += '<th>Mode</th>';
+ //    htmlStr += '<th>URL</th>';
+ //    htmlStr += '<th>Query/Message</th>';
+ //    htmlStr += '<th>Date</th>';
+ //    htmlStr += '</tr></thead>';
+	// var row = $('<tr>');
+	row.append($('<td>').text(logs[i].query || ''));
     for (var i = 0; i < 3000 && i < logs.length; i++) {
         htmlStr += '<tr ';
         if (logs[i].type === 'ERROR') htmlStr += 'style="color:Red">';
@@ -231,7 +240,8 @@ function TMNShowLog(items) {
         htmlStr += '</font></tr>';
     }
     htmlStr += '</table>';
-    $('#tmn_logs_container').html(htmlStr);
+    //$('#tmn_logs_container').html(htmlStr);
+	$('#tmn_logs_container').append(row);
 	$('#overlay_logs').css("display","block");
 	//window.setTimeout(TMNShowLog, 1000,items);
 }
