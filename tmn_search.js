@@ -542,6 +542,7 @@ TRACKMENOT.TMNInjected = function() {
             var inpt = document.querySelector('input[name="q"], input[name="p"], input[name="wd"]');
             if (inpt && inpt.form) {
                 inpt.value = queryToSend;
+				inpt.dispatchEvent(new Event('input', { bubbles: true }));
                 if (tmn_mode === "submit") {
                     inpt.form.submit();
                 } else {
