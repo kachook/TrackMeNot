@@ -508,31 +508,52 @@ TRACKMENOT.TMNInjected = function() {
     //     }
     // }
 
-	var sendQuery = function(engine, query, mode, urlmap) {
-        cout("Sending query " + query + " to " + engine.name + " (" + mode + ")");
+	var sendQuery = function(engine, queryToSend, tmn_mode, url_map) {
+        var host = "";
+        try { host = window.location.host; } catch (ex) { host = ""; }
         
-        // 1. Find the main search input field (Google/Bing use 'q', Yahoo uses 'p')
-        var inpt = document.querySelector('input[name="q"], input[name="p"]');
+        var reg = new RegExp(engine.host, 'g');
+        var encodedUrl = queryToURL(url_map, queryToSend);
         
-        if (inpt && inpt.form) {
-            // 2. Inject the fake query
-            inpt.value = query;
-            
-            // 3. Submit the form directly instead of trying to find the button
-            if (mode === "submit") {
-                inpt.form.submit();
-            } else {
-                // If it's from a click mode, try to click the submit button inside the form
-                var submitBtn = inpt.form.querySelector('input[type="submit"], button[type="submit"]');
-                if (submitBtn) clickElt(submitBtn);
-                else inpt.form.submit(); // fallback
+        var logEntry = JSON.stringify({
+            'type': 'query',
+            "engine": engine.id,
+            'mode': tmn_mode,
+            'query': queryToSend,
+            'id': tmn_id
+        });
+        log(logEntry);
+        updateStatus(queryToSend);
+
+        // 1. If we are NOT on the targeted search engine domain, navigate the tab directly
+        if (host === "" || !host.match(reg)) {
+            try {
+                window.location.href = encodedUrl;
+                return encodedUrl;
+            } catch (ex) {
+                cout("Navigation failed: " + ex);
+                return null;
             }
         } else {
-            cout("Could not find search input on " + engine.name);
+            // 2. We ARE on the right website, look for the input field to simulate typing
+            var inpt = document.querySelector('input[name="q"], input[name="p"], input[name="wd"]');
+            if (inpt && inpt.form) {
+                inpt.value = queryToSend;
+                if (tmn_mode === "submit") {
+                    inpt.form.submit();
+                } else {
+                    var submitBtn = inpt.form.querySelector('input[type="submit"], button[type="submit"]');
+                    if (submitBtn) clickElt(submitBtn);
+                    else inpt.form.submit();
+                }
+                return null;
+            } else {
+                // Fallback: If search engines changed their DOM design, default back to URL navigation
+                window.location.href = encodedUrl;
+                return encodedUrl;
+            }
         }
-        return engine.url;
     }
-
 
     function isSafeHost(host) {
         for (var i = 0; i < engines_regex.length; i++) {
