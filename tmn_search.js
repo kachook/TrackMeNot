@@ -14,12 +14,7 @@
  along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
  ********************************************************************************/
 
-var api;
-if (chrome === undefined) {
-    api = browser;
-} else {
-    api = chrome;
-}
+var api = (typeof browser !== 'undefined') ? browser : chrome;
 
 if (!TRACKMENOT)
     var TRACKMENOT = {};
@@ -456,64 +451,87 @@ TRACKMENOT.TMNInjected = function() {
     }
 
 
-    function sendQuery(engine, queryToSend, tmn_mode, url) {
-        var host;
-        try {
-            host = window.location.host;
-        } catch (ex) {
-            host = "";
-        }
-        var reg = new RegExp(engine.host, 'g');
-        var encodedUrl = queryToURL(url, queryToSend);
-        var logEntry = JSON.stringify({
-            'type': 'query',
-            "engine": engine.id,
-            'mode': tmn_mode,
-            'query': queryToSend,
-            'id': tmn_id
-        });
-        log(logEntry);
-        updateStatus(queryToSend);
-        if (host === "" || !host.match(reg)) {
-            try {
-                window.location.href = encodedUrl;
-                return encodedUrl;
-            } catch (ex) {
-                cout("Caught exception: " + ex);
-                api.runtime.sendMessage({
-                    "url": encodedUrl
-                });
-                return null;
-            }
+    // function sendQuery(engine, queryToSend, tmn_mode, url) {
+    //     var host;
+    //     try {
+    //         host = window.location.host;
+    //     } catch (ex) {
+    //         host = "";
+    //     }
+    //     var reg = new RegExp(engine.host, 'g');
+    //     var encodedUrl = queryToURL(url, queryToSend);
+    //     var logEntry = JSON.stringify({
+    //         'type': 'query',
+    //         "engine": engine.id,
+    //         'mode': tmn_mode,
+    //         'query': queryToSend,
+    //         'id': tmn_id
+    //     });
+    //     log(logEntry);
+    //     updateStatus(queryToSend);
+    //     if (host === "" || !host.match(reg)) {
+    //         try {
+    //             window.location.href = encodedUrl;
+    //             return encodedUrl;
+    //         } catch (ex) {
+    //             cout("Caught exception: " + ex);
+    //             api.runtime.sendMessage({
+    //                 "url": encodedUrl
+    //             });
+    //             return null;
+    //         }
 
-        } else {
-            var searchBox = get_box(engine.id);
-            var searchButton = get_button(engine.id);
-            if (searchBox && searchButton && engine !== 'aol') {
-                debug("The searchbox has been found " + searchBox);
-                searchBox.value = getCommonWords(searchBox.value, queryToSend).join(' ');
-                searchBox.selectionStart = 0;
-                searchBox.selectionEnd = 0;
-                var chara = new Array();
-                typeQuery(queryToSend, 0, searchBox, chara, false);
-                return null;
+    //     } else {
+    //         var searchBox = get_box(engine.id);
+    //         var searchButton = get_button(engine.id);
+    //         if (searchBox && searchButton && engine !== 'aol') {
+    //             debug("The searchbox has been found " + searchBox);
+    //             searchBox.value = getCommonWords(searchBox.value, queryToSend).join(' ');
+    //             searchBox.selectionStart = 0;
+    //             searchBox.selectionEnd = 0;
+    //             var chara = new Array();
+    //             typeQuery(queryToSend, 0, searchBox, chara, false);
+    //             return null;
+    //         } else {
+    //             try {
+    //                 window.location.href = encodedUrl;
+    //                 return encodedUrl;
+    //             } catch (ex) {
+    //                 cout("Caught exception: " + ex);
+    //                 api.runtime.sendMessage({
+    //                     "url": encodedUrl
+    //                 });
+    //                 return null;
+    //             }
+
+    //         }
+    //     }
+    // }
+
+	var sendQuery = function(engine, query, mode, urlmap) {
+        cout("Sending query " + query + " to " + engine.name + " (" + mode + ")");
+        
+        // 1. Find the main search input field (Google/Bing use 'q', Yahoo uses 'p')
+        var inpt = document.querySelector('input[name="q"], input[name="p"]');
+        
+        if (inpt && inpt.form) {
+            // 2. Inject the fake query
+            inpt.value = query;
+            
+            // 3. Submit the form directly instead of trying to find the button
+            if (mode === "submit") {
+                inpt.form.submit();
             } else {
-                try {
-                    window.location.href = encodedUrl;
-                    return encodedUrl;
-                } catch (ex) {
-                    cout("Caught exception: " + ex);
-                    api.runtime.sendMessage({
-                        "url": encodedUrl
-                    });
-                    return null;
-                }
-
+                // If it's just a click mode, try to click the submit button inside the form
+                var submitBtn = inpt.form.querySelector('input[type="submit"], button[type="submit"]');
+                if (submitBtn) simulateClick(submitBtn);
+                else inpt.form.submit(); // fallback
             }
+        } else {
+            cout("Could not find search input on " + engine.name);
         }
+        return engine.url;
     }
-
-
 
 
     function isSafeHost(host) {
