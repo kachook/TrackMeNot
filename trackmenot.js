@@ -136,7 +136,7 @@ TRACKMENOT.TMNSearch = function() {
             id: 'yahoo',
             name: 'Yahoo! Search',
             urlmap: "http://search.yahoo.com/search;_ylt=" + getYahooId() + "?ei=UTF-8&fr=sfp&fr2=sfp&p=|&fspl=1",
-            enabled: true,
+            enabled: false,
             regexmap: "^(https?:\/\/[a-z.]*?search\.yahoo\.com\/search.*?p=)([^&]*)(.*)$",
             host: "([a-z.]*?search\.yahoo\.com)$"
         },
@@ -1057,7 +1057,7 @@ function readDHSList() {
         tmn_options.use_dhs_list = false;
         tmn_options.kwBlackList = ['bomb', 'porn', 'pornographie'];
         tmn_options.saveLogs= true;
-        tmn_options.feedList = ['http://www.techmeme.com/index.xml','http://rss.slashdot.org/Slashdot/slashdot','http://feeds.nytimes.com/nyt/rss/HomePage'];
+        tmn_options.feedList = ['http://www.techmeme.com/index.xml','http://rss.slashdot.org/Slashdot/slashdot'];
         tmn_options.disableLogs= false;
         tmn_options.tmn_id = 0;     
     }
