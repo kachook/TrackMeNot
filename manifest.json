@@ -1,51 +1,61 @@
 {
-    "author": "TrackMeNot",
-    "background": {
-    	"scripts": ["trackmenot.js"],
-    	"type": "module"
+  "author": "TrackMeNot",
+  "name": "TrackMeNot",
+  "version": "0.10.46",
+  "description": "Protect against data profiling by search engines",
+  "manifest_version": 3,
+  
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "trackmenot@kachook.github.io",
+      "strict_min_version": "109.0"
+    }
   },
+
+  "background": {
+    "scripts": ["trackmenot.js"],
+    "type": "module"
+  },
+
   "action": {
     "default_icon": "tmn.png",
     "default_popup": "tmn_menu.html"
   },
-    "content_scripts": [
-        {
-            "matches": [
-                "http://*/*",
-                "https://*/*"
-            ],
-            "js": [
-                "tmn_search.js"
-            ],
-            "run_at": "document_start",
-            "all_frames": false
-        }
-    ],
-    "description": "Protect against data profiling by search engines",
-    "icons": {
-        "16": "icon16.png",
-        "48": "icon32.png"
-    },
-    "manifest_version": 3,
-    "name": "TrackMeNot",
-    "options_ui": {
-      "page": "options.html"
-    },
-    "permissions": [
-        "storage", 
-    	"alarms",
-    	"contextualIdentities",
-		"tabs",
-		"cookies",
-        "https://*/*",
+
+  "content_scripts": [
+    {
+      "matches": [
         "http://*/*",
-        "webNavigation",
-        "storage"
-    ],
-	"host_permissions": [
-    	"*://*.google.com/*",
-    	"*://*.bing.com/*",
-    	"*://*.yahoo.com/*"
+        "https://*/*"
+      ],
+      "js": [
+        "tmn_search.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": false
+    }
+  ],
+
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon32.png"
+  },
+
+  "options_ui": {
+    "page": "options.html"
+  },
+
+  "permissions": [
+    "storage", 
+    "alarms",
+    "contextualIdentities",
+    "tabs",
+    "cookies",
+    "webNavigation"
+  ],
+
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ]
-    "version": "0.10.46"
 }
