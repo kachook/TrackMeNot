@@ -472,7 +472,7 @@ TRACKMENOT.TMNSearch = function() {
     // returns # of keywords added
     function filterKeyWords(rssTitles) {
         var addStr = ""; //tmp-debugging
-        var forbiddenChar = new RegExp("[ @#<>\"\\\/,;'Õ{}:?%|\^~`=]+", "g");
+        var forbiddenChar = new RegExp("[ @#<>\"\\\/,;'Ã•{}:?%|\^~`=]+", "g");
         var splitRegExp = new RegExp('[\\[\\]\\(\\)\\"\']+', "g");
         var wordArray = rssTitles.split(forbiddenChar);
 
@@ -484,7 +484,7 @@ TRACKMENOT.TMNSearch = function() {
                             wordArray[i + 1].match(splitRegExp))) {
                         var nextWord = wordArray[i + 1]; // added new check here -dch
                         if (nextWord !== nextWord.toLowerCase()) {
-                            nextWord = trim(nextWord.toLowerCase().replace(/\s/g, '').replace(/[(<>"'Õ&]/g, ''));
+                            nextWord = trim(nextWord.toLowerCase().replace(/\s/g, '').replace(/[(<>"'Ã•&]/g, ''));
                             if (nextWord.length > 1) {
                                 word += ' ' + nextWord;
                             }
@@ -528,65 +528,102 @@ TRACKMENOT.TMNSearch = function() {
     }
 
 
-    function readDHSList() {
-        TMNQueries.dhs = [];
-        var i = 0;
-        var req = new XMLHttpRequest();
-        try {
-            req.open('GET', "dhs_keywords.json", true);
-            req.onreadystatechange = function() {
+ //    function readDHSList() {
+ //        TMNQueries.dhs = [];
+ //        var i = 0;
+ //        var req = new XMLHttpRequest();
+ //        try {
+ //            req.open('GET', "dhs_keywords.json", true);
+ //            req.onreadystatechange = function() {
 				  
 											
-				if (req.readyState === 4) {
-					var keywords = JSON.parse(req.responseText).keywords;           
-					for (var cat of keywords) {
-						TMNQueries.dhs[i] = {};
-						TMNQueries.dhs[i].category_name = cat.category_name;
-						TMNQueries.dhs[i].words = [];
-						for (var word of cat.category_words)
-							TMNQueries.dhs[i].words.push(word.name);
-						i++;
-					}
-					return;
-				} 
+	// 			if (req.readyState === 4) {
+	// 				var keywords = JSON.parse(req.responseText).keywords;           
+	// 				for (var cat of keywords) {
+	// 					TMNQueries.dhs[i] = {};
+	// 					TMNQueries.dhs[i].category_name = cat.category_name;
+	// 					TMNQueries.dhs[i].words = [];
+	// 					for (var word of cat.category_words)
+	// 						TMNQueries.dhs[i].words.push(word.name);
+	// 					i++;
+	// 				}
+	// 				return;
+	// 			} 
 												 
 										   
 											  
 																			   
 								  
 				 
-            }
+ //            }
 					   
 		   
-			req.send();
-		  } catch (ex) {
-			cout("[WARN]  Can not load DHS list: " + ex.message);
-			return
-		 }
-	}
-
-
-    function doRssFetch(feedUrl) {
-        if (!feedUrl) return;
-        cout("Feed Url: " + feedUrl);
-        var req = new XMLHttpRequest();
-        try {
-            req.open('GET', feedUrl, true);
-            req.onreadystatechange = function() {
-                if (req.readyState === 4) {
-                    var doc = req.responseXML;
-                    debug(doc);
-                    addRssTitles(doc, feedUrl);
+	// 		req.send();
+	// 	  } catch (ex) {
+	// 		cout("[WARN]  Can not load DHS list: " + ex.message);
+	// 		return
+	// 	 }
+	// }
+//Replace the old XHR block with this cleaner Promise-based fetch
+function readDHSList() {
+    TMNQueries.dhs = [];
+    
+    fetch(api.runtime.getURL("dhs_keywords.json"))
+        .then(response => response.json())
+        .then(data => {
+            var i = 0;
+            for (var cat of data.keywords) {
+                TMNQueries.dhs[i] = {};
+                TMNQueries.dhs[i].category_name = cat.category_name;
+                TMNQueries.dhs[i].words = [];
+                for (var word of cat.category_words) {
+                    TMNQueries.dhs[i].words.push(word.name);
                 }
-            };
-            req.send();
-        } catch (ex) {
-            cout("[WARN]  doRssFetch(" + feedUrl + ")\n" +
-                "  " + ex.message + " | Using defaults...");
-            return; // no adds here...
-        }
+                i++;
+            }
+        })
+        .catch(error => {
+            cout("[WARN] Can not load DHS list: " + error.message);
+        });
+}
 
-    }
+    // function doRssFetch(feedUrl) {
+    //     if (!feedUrl) return;
+    //     cout("Feed Url: " + feedUrl);
+    //     var req = new XMLHttpRequest();
+    //     try {
+    //         req.open('GET', feedUrl, true);
+    //         req.onreadystatechange = function() {
+    //             if (req.readyState === 4) {
+    //                 var doc = req.responseXML;
+    //                 debug(doc);
+    //                 addRssTitles(doc, feedUrl);
+    //             }
+    //         };
+    //         req.send();
+    //     } catch (ex) {
+    //         cout("[WARN]  doRssFetch(" + feedUrl + ")\n" +
+    //             "  " + ex.message + " | Using defaults...");
+    //         return; // no adds here...
+    //     }
+
+    // }
+	//Replace the XHR logic with fetch() and use the native DOMParser to parse the XML string (Firefox background pages support DOMParser
+	function doRssFetch(feedUrl) {
+   		if (!feedUrl) return;
+    	cout("Feed Url: " + feedUrl);
+    
+    	fetch(feedUrl)
+        	.then(response => response.text())
+        	.then(str => {
+            	var parser = new DOMParser();
+            	var doc = parser.parseFromString(str, "text/xml");
+            	addRssTitles(doc, feedUrl);
+        	})
+        	.catch(error => {
+            	cout("[WARN] doRssFetch(" + feedUrl + ")\n  " + error.message + " | Using defaults...");
+        	});
+	}
 
     function getSubQuery(queryWords) {
         var incQuery = "";
@@ -626,9 +663,9 @@ TRACKMENOT.TMNSearch = function() {
 
     function updateOnErr() {
 		try {
-			api.browserAction.setBadgeBackgroundColor({'color': [255, 0, 0, 255]});
-			api.browserAction.setBadgeText({'text': 'Error'});
-			api.browserAction.setTitle({'title': 'TMN Error'});
+			api.action.setBadgeBackgroundColor({'color': [255, 0, 0, 255]});
+			api.action.setBadgeText({'text': 'Error'});
+			api.action.setTitle({'title': 'TMN Error'});
 		} catch (ex){
 			debug("browserAction are not supported on mobile")
 		}
@@ -636,9 +673,9 @@ TRACKMENOT.TMNSearch = function() {
 
     function updateOnSend(queryToSend) {
 		try{
-			api.browserAction.setBadgeBackgroundColor({'color': [113, 113, 198, 255]})
-			api.browserAction.setBadgeText({'text': queryToSend});
-			api.browserAction.setTitle({'title': engine + ': ' + queryToSend});
+			api.action.setBadgeBackgroundColor({'color': [113, 113, 198, 255]})
+			api.action.setBadgeText({'text': queryToSend});
+			api.action.setTitle({'title': engine + ': ' + queryToSend});
 		} catch (ex){
 			debug("browserAction are not supported on mobile")
 		}
@@ -825,10 +862,18 @@ TRACKMENOT.TMNSearch = function() {
         if (isBursting()) engine = burstEngine;
         else engine = chooseElt(tmn_engines.list.filter(function (x) {return x.enabled})).id;
         debug('NextSearchScheduled on: ' + engine);
-        window.clearTimeout(tmn_errTimeout);
-        tmn_errTimeout = window.setTimeout(rescheduleOnError, delay * 3);
-        window.clearTimeout(tmn_searchTimer);
-        tmn_searchTimer = window.setTimeout(doSearch, delay);
+		// --- OLD LOGIC ---
+        // window.clearTimeout(tmn_errTimeout);
+        // tmn_errTimeout = window.setTimeout(rescheduleOnError, delay * 3);
+        // window.clearTimeout(tmn_searchTimer);
+        // tmn_searchTimer = window.setTimeout(doSearch, delay);
+		// --- NEW MV3 LOGIC ---
+		api.alarms.clear("tmn_errTimeout");
+		api.alarms.clear("tmn_searchTimer");
+
+		// Alarms trigger based on absolute time (Date.now() + milliseconds)
+		api.alarms.create("tmn_errTimeout", { when: Date.now() + (delay * 3) });
+		api.alarms.create("tmn_searchTimer", { when: Date.now() + delay });
     }
 
     function enterBurst(burst_engine) {
@@ -857,9 +902,9 @@ TRACKMENOT.TMNSearch = function() {
         tmn_options.enabled= false;
         deleteTab();
 		try {
-			api.browserAction.setBadgeBackgroundColor({'color': [255, 0, 0, 255]});
-			api.browserAction.setBadgeText({'text': 'Off'});
-			api.browserAction.setTitle({'title': 'Off'});
+			api.action.setBadgeBackgroundColor({'color': [255, 0, 0, 255]});
+			api.action.setBadgeText({'text': 'Off'});
+			api.action.setTitle({'title': 'Off'});
 		} catch (ex) {
 			debug("browserAction are not supported on mobile")
 		}
@@ -1056,11 +1101,11 @@ TRACKMENOT.TMNSearch = function() {
 												 
 		try{
 			if (tmn_options.enabled) {
-				api.browserAction.setBadgeText({'text': 'ON'});
-				api.browserAction.setTitle({'title': 'TMN is ON'});
+				api.action.setBadgeText({'text': 'ON'});
+				api.action.setTitle({'title': 'TMN is ON'});
 			} else {
-				api.browserAction.setBadgeText({'text': 'OFF'});
-				api.browserAction.setTitle({'title': 'TMN is OFF'});
+				api.action.setBadgeText({'text': 'OFF'});
+				api.action.setTitle({'title': 'TMN is OFF'});
 			}
 		} catch (ex) {
 			debug("browserAction are not supported on mobile")
@@ -1087,11 +1132,11 @@ TRACKMENOT.TMNSearch = function() {
 		changeTabStatus(item.useTab); 							  
 		try {
 			if (item.enabled) {
-				api.browserAction.setBadgeText({'text': 'ON'});
-				api.browserAction.setTitle({'title': 'TMN is ON'});
+				api.action.setBadgeText({'text': 'ON'});
+				api.action.setTitle({'title': 'TMN is ON'});
 			} else {
-				api.browserAction.setBadgeText({'text': 'OFF'});
-				api.browserAction.setTitle({'title': 'TMN is OFF'});
+				api.action.setBadgeText({'text': 'OFF'});
+				api.action.setTitle({'title': 'TMN is OFF'});
 			}
 		} catch (ex) {
 			debug("browserAction are not supported on mobile")
@@ -1129,6 +1174,15 @@ TRACKMENOT.TMNSearch = function() {
             handleRequest(request, sender, sendResponse);
         },
 
+		// ADD THESE NEW BLOCKS:
+        _doSearch: function() {
+            doSearch();
+        },
+
+        _rescheduleOnError: function() {
+            rescheduleOnError();
+        },
+/////////////////////
         _logStorageChange: function (items) {
             if ('options_tmn' in items) 
                 updateOptions(items.options_tmn.newValue);
@@ -1273,6 +1327,13 @@ TRACKMENOT.TMNSearch = function() {
 
 
 api.runtime.onMessage.addListener(TRACKMENOT.TMNSearch._handleRequest);
+api.alarms.onAlarm.addListener(function(alarm) {
+    if (alarm.name === "tmn_searchTimer") {
+        TRACKMENOT.TMNSearch._doSearch(); // Make sure to expose doSearch in your return block below!
+    } else if (alarm.name === "tmn_errTimeout") {
+        TRACKMENOT.TMNSearch._rescheduleOnError(); // Expose this one too
+    }
+});
 // Used to prevent Yahoo! from opening new tabs, but block all tab opened from tmn tab
 api.tabs.onCreated.addListener(function(created_tab) {          
 		TRACKMENOT.TMNSearch._deleteOpenedTab(created_tab);   
