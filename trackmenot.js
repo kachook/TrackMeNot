@@ -908,8 +908,10 @@ function readDHSList() {
 		} catch (ex) {
 			debug("browserAction are not supported on mobile")
 		}
-        window.clearTimeout(tmn_searchTimer);
-        window.clearTimeout(tmn_errTimeout);
+        //window.clearTimeout(tmn_searchTimer);
+        //window.clearTimeout(tmn_errTimeout);
+		api.alarms.clear("tmn_searchTimer");
+        api.alarms.clear("tmn_errTimeout");
     }
 
     function formatNum(val) {
@@ -1019,7 +1021,7 @@ function readDHSList() {
             case "setHTML":
 				//cout("The content of the page is:" + request.html);
 				extractQueries(request.html);
-				brek;
+				break;
 			case "tmnError": //Remove timer and then reschedule;
                 clearTimeout(tmn_errTimeout);
                 rescheduleOnError();
@@ -1224,7 +1226,7 @@ function readDHSList() {
 			
             		
             try {
-                tmnLogs = items(["logs_tmn"]);
+                tmnLogs = items["logs_tmn"] || []; 
             } catch (ex) {
                 tmnLogs = [];
                 cout("can not restore logs")
@@ -1258,7 +1260,7 @@ function readDHSList() {
             initQueries();
         
             try {
-                tmnLogs = items(["logs_tmn"]);
+                tmnLogs = items["logs_tmn"] || []; 
             } catch (ex) {
                 tmnLogs = [];
                 cout("can not restore logs")
