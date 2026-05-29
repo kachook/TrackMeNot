@@ -775,9 +775,7 @@ function readDHSList() {
 		var cookies_string = cookies.map(function (x) {return x.name + "="+ x.value;}).join("; ");
 		cout("The encoded URL is " + queryURL)
 		fetch(queryURL, {
-				headers: {
-					"cookie": cookies_string
-				}
+				credentials: 'include' // This ensures the search engine's cookies are sent
 				}
 			).then(function(response) {
 			if (response.ok){
