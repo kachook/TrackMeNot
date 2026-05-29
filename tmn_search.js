@@ -16,6 +16,42 @@
 
 var api = (typeof browser !== 'undefined') ? browser : chrome;
 
+var engines_regex = [
+        {
+            'id': 'google',
+            'name': 'Google Searchs',
+            "host": "(www\.google\.(co\.|com\.)?[a-z]{2,3})$",
+            'regexmap': "^(https?:\/\/[a-z]+\.google\.(co\\.|com\\.)?[a-z]{2,3}\/(search){1}[\?]?.*?[&\?]{1}q=)([^&]*)(.*)$"
+        },
+        {
+            'id': 'yahoo',
+            'name': 'Yahoo! Search',
+            "host": "([a-z.]*?search\.yahoo\.com)$",
+            'regexmap': "^(https?:\/\/[a-z.]*?search\.yahoo\.com\/search.*?p=)([^&]*)(.*)$"
+        },
+        {
+            'id': 'bing',
+            'name': 'Bing Search',
+            "host": "(www\.bing\.com)$",
+            'regexmap': "^(https?:\/\/www\.bing\.com\/search\?[^&]*q=)([^&]*)(.*)$"
+
+        },
+        {
+            'id': 'baidu',
+            'name': 'Baidu Search',
+            "host": "(www\.baidu\.com)$",
+            'regexmap': "^(https?:\/\/www\.baidu\.com\/s\?.*?wd=)([^&]*)(.*)$"
+
+        },
+        {
+            'id': 'aol',
+            'name': 'Aol Search',
+            "host": "([a-z0-9.]*?search\.aol\.com)$",
+            'regexmap': "^(https?:\/\/[a-z0-9.]*?search\.aol\.com\/aol\/search\?.*?q=)([^&]*)(.*)$"
+        }
+    ];
+
+
 if (!TRACKMENOT)
     var TRACKMENOT = {};
 
@@ -171,40 +207,7 @@ TRACKMENOT.TMNInjected = function() {
     };
 
 
-    var engines_regex = [
-        {
-            'id': 'google',
-            'name': 'Google Searchs',
-            "host": "(www\.google\.(co\.|com\.)?[a-z]{2,3})$",
-            'regexmap': "^(https?:\/\/[a-z]+\.google\.(co\\.|com\\.)?[a-z]{2,3}\/(search){1}[\?]?.*?[&\?]{1}q=)([^&]*)(.*)$"
-        },
-        {
-            'id': 'yahoo',
-            'name': 'Yahoo! Search',
-            "host": "([a-z.]*?search\.yahoo\.com)$",
-            'regexmap': "^(https?:\/\/[a-z.]*?search\.yahoo\.com\/search.*?p=)([^&]*)(.*)$"
-        },
-        {
-            'id': 'bing',
-            'name': 'Bing Search',
-            "host": "(www\.bing\.com)$",
-            'regexmap': "^(https?:\/\/www\.bing\.com\/search\?[^&]*q=)([^&]*)(.*)$"
-
-        },
-        {
-            'id': 'baidu',
-            'name': 'Baidu Search',
-            "host": "(www\.baidu\.com)$",
-            'regexmap': "^(https?:\/\/www\.baidu\.com\/s\?.*?wd=)([^&]*)(.*)$"
-
-        },
-        {
-            'id': 'aol',
-            'name': 'Aol Search',
-            "host": "([a-z0-9.]*?search\.aol\.com)$",
-            'regexmap': "^(https?:\/\/[a-z0-9.]*?search\.aol\.com\/aol\/search\?.*?q=)([^&]*)(.*)$"
-        }
-    ];
+    
     function roll(min, max) {
         return Math.floor(Math.random() * (max + 1)) + min;
     }
@@ -601,10 +604,10 @@ TRACKMENOT.TMNInjected = function() {
 				api.runtime.sendMessage(req);
 			}
             if (request.tmnQuery) {
-                /*if (tmn_id >= request.tmnID) {
+                if (tmn_id >= request.tmnID) {
                     debug("Duplicate queries ignored");
                     return;
-                }*/
+                }
                 //alert("Received: " + request.tmnQuery + " on engine: " + request.tmnEngine.id + " mode: " + request.tmnMode + " tmn id " + request.tmnID);
                 var tmn_query = request.tmnQuery;
                 var engine = JSON.parse(request.tmnEngine);
