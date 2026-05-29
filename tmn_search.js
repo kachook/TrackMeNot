@@ -522,9 +522,9 @@ TRACKMENOT.TMNInjected = function() {
             if (mode === "submit") {
                 inpt.form.submit();
             } else {
-                // If it's just a click mode, try to click the submit button inside the form
+                // If it's from a click mode, try to click the submit button inside the form
                 var submitBtn = inpt.form.querySelector('input[type="submit"], button[type="submit"]');
-                if (submitBtn) simulateClick(submitBtn);
+                if (submitBtn) clickElt(submitBtn);
                 else inpt.form.submit(); // fallback
             }
         } else {
@@ -537,7 +537,7 @@ TRACKMENOT.TMNInjected = function() {
     function isSafeHost(host) {
         for (var i = 0; i < engines_regex.length; i++) {
             var eng = engines_regex[i];
-            var regex = eng.hostMap;
+            var regex = eng.host;
             cout("regex :" + regex);
             if (host.match(regex)) {
                 return true;
