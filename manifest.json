@@ -1,9 +1,10 @@
 {
     "author": "TrackMeNot",
     "background": {
-        "page": "background.html"
-    },
-  "browser_action": {
+    	"scripts": ["trackmenot.js"],
+    	"type": "module"
+  },
+  "action": {
     "default_icon": "tmn.png",
     "default_popup": "tmn_menu.html"
   },
@@ -25,18 +26,26 @@
         "16": "icon16.png",
         "48": "icon32.png"
     },
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "TrackMeNot",
     "options_ui": {
       "page": "options.html"
     },
     "permissions": [
-        "tabs",
+        "storage", 
+    	"alarms",
+    	"contextualIdentities",
+		"tabs",
 		"cookies",
         "https://*/*",
         "http://*/*",
         "webNavigation",
         "storage"
     ],
+	"host_permissions": [
+    	"*://*.google.com/*",
+    	"*://*.bing.com/*",
+    	"*://*.yahoo.com/*"
+  ]
     "version": "0.10.46"
 }
