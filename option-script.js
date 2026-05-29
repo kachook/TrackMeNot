@@ -10,7 +10,7 @@ if (chrome == undefined) {
 
 var tmn_options = {};
 var tmn_engines ={};
-var tmn = api.extension.getBackgroundPage().TRACKMENOT.TMNSearch;
+//var tmn = api.extension.getBackgroundPage().TRACKMENOT.TMNSearch;
 var options = {};
 
 
@@ -48,10 +48,19 @@ function loadHandlers() {
         api.storage.local.get(["logs_tmn"],TMNShowLog);
     });
 
+    // $("#trackmenot-opt-showqueries").click(function() {
+    //     var tmn = api.extension.getBackgroundPage().TRACKMENOT.TMNSearch;
+    //     var queries = tmn._getQueries();
+    //     TMNShowQueries(queries);
+    // });
+
+	// --- NEW MV3 LOGIC ---
     $("#trackmenot-opt-showqueries").click(function() {
-        var tmn = api.extension.getBackgroundPage().TRACKMENOT.TMNSearch;
-        var queries = tmn._getQueries();
-        TMNShowQueries(queries);
+        api.runtime.sendMessage({ tmn: "getQueries" }, function(response) {
+            if (response && response.queries) {
+                TMNShowQueries(response.queries);
+            }
+        });
     });
 	
 	$("#overlay_logs").unbind().click(TMNHideLog);
@@ -115,12 +124,22 @@ function loadHandlers() {
 									
     }
     
-    function clearOptions() {
-		var tmn = api.extension.getBackgroundPage().TRACKMENOT.TMNSearch;
-		api.storage.local.clear();
-		tmn._resetSettings();
-		getStorage(["engines_tmn","options_tmn"],TMNLoadOptionWindow );
-	}
+ //    function clearOptions() {
+	// 	var tmn = api.extension.getBackgroundPage().TRACKMENOT.TMNSearch;
+	// 	api.storage.local.clear();
+	// 	tmn._resetSettings();
+	// 	getStorage(["engines_tmn","options_tmn"],TMNLoadOptionWindow );
+	// }
+	  // --- NEW MV3 LOGIC ---
+      function clearOptions() {
+      	api.storage.local.clear();
+        api.runtime.sendMessage({ tmn: "resetSettings" });
+        
+        // Add a slight delay to allow the background script to reset storage before reloading the UI
+        setTimeout(function() {
+            getStorage(["engines_tmn","options_tmn"], TMNLoadOptionWindow);
+        }, 150);
+    }
 
       function addEngine(param) {
 
