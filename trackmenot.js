@@ -1004,7 +1004,16 @@ function readDHSList() {
         }
 
         switch (request.tmn) {			   
-            case "pageLoaded": 
+            // ADD THESE TWO CASES TO YOUR SWITCH STATEMENT
+            case "getQueries":
+                if (sendResponse) {
+                    sendResponse({ queries: TRACKMENOT.TMNSearch._getQueries() });
+                }
+                break;
+            case "resetSettings":
+                TRACKMENOT.TMNSearch._resetSettings();
+                break;
+			case "pageLoaded": 
                 if (!tmn_hasloaded) {
                     tmn_hasloaded = true;
                     clearTimeout(tmn_errTimeout);
