@@ -832,25 +832,23 @@ function readDHSList() {
     }
 
     function formatNum(val) {
-        if (val < 10) return '0' + val;
-        return val;
+        return String(val).padStart(2, '0');
     }
 
     function log(entry) {
         if (tmn_options.disableLogs) return;
-        try {
-            if (entry !== null) {
-                if (entry.type === 'query') {
-                    if (entry.id && entry.id === tmn_logged_id) return;
-                    tmn_logged_id = entry.id;
-                }
-                var now = new Date();
-                entry.date = formatNum(now.getHours()) + ":" + formatNum(now.getMinutes()) + ":" + formatNum(now.getSeconds()) +
-                             '   ' + (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear();
-            }
-        } catch (ex) {
-            cout("[ERROR] " + ex + " / " + ex.message + "\nlogging msg");
-        }
+    	try {
+        	const now = new Date();
+        	const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()]
+                        	.map(formatNum).join(':');
+        
+        	const dateStr = [now.getMonth() + 1, now.getDate(), now.getFullYear()]
+                        	.map(formatNum).join('/');
+
+        	entry.date = `${timeStr}   ${dateStr}`;
+    	} catch (ex) {
+        	cout("[ERROR] Logging failed: " + ex.message);
+    	}
         tmnLogs.unshift(entry);
         api.storage.local.set({"logs_tmn":tmnLogs});
     }
