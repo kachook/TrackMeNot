@@ -53,11 +53,7 @@ TRACKMENOT.TMNSearch = function() {
     var tmn_scheduledSearch = false;
     var tmn_hasloaded = false;
     var currentTMNURL = '';
-    
-    var tmn_options= {};
-
-
-
+        
     var skipex = new Array(
         /calendar/i, /advanced/i, /click /i, /terms/i, /Groups/i,
         /Images/, /Maps/, /search/i, /cache/i, /similar/i, /&#169;/,
@@ -890,13 +886,22 @@ function readDHSList() {
 
 
     function handleRequest(request, sender, sendResponse) {
-        if (request.tmnLog) {
-            cout("Background logging : " + request.tmnLog);
-            var logtext = JSON.parse(request.tmnLog);
-            log(logtext);
-            sendResponse({});
-            return;
-        }
+        // Standardize: Ensure we have a request
+    	if (!request) return false;
+
+		if (request.tmnLog) {
+        	var logtext = JSON.parse(request.tmnLog);
+        	log(logtext);
+        	sendResponse({status: "ok"});
+        	return false; // Synchronous
+    	}
+		// if (request.tmnLog) {
+  //           cout("Background logging : " + request.tmnLog);
+  //           var logtext = JSON.parse(request.tmnLog);
+  //           log(logtext);
+  //           sendResponse({});
+  //           return;
+  //       }
         if (request.updateStatus) {
             updateOnSend(request.updateStatus);
             sendResponse({});
@@ -1186,16 +1191,17 @@ function readDHSList() {
 
         _resetSettings: function () {			
             setDefaultEngines(); 
-            setDefaultOptions();
-            initQueries();
-        
-            try {
-                tmnLogs = items["logs_tmn"] || []; 
-            } catch (ex) {
-                tmnLogs = [];
-                cout("can not restore logs")
-            }
-            saveOptions();
+    		setDefaultOptions();
+    		initQueries();
+
+    		// Reset logs to empty
+    		tmnLogs = [];
+    
+    		// Explicitly clear the logs in storage as well
+    		api.storage.local.set({"logs_tmn": []});
+
+    		saveOptions();
+    		cout("TrackMeNot settings and engines have been reset to defaults.");
 
         },
 		
