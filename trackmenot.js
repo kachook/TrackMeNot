@@ -135,7 +135,7 @@ TRACKMENOT.TMNSearch = function() {
         {
             id: 'yahoo',
             name: 'Yahoo! Search',
-            urlmap: "http://search.yahoo.com/search;_ylt=" + getYahooId() + "?ei=UTF-8&fr=sfp&fr2=sfp&p=|&fspl=1",
+            urlmap: "https://search.yahoo.com/search?p=|",
             enabled: false,
             regexmap: "^(https?:\/\/[a-z.]*?search\.yahoo\.com\/search.*?p=)([^&]*)(.*)$",
             host: "([a-z.]*?search\.yahoo\.com)$"
@@ -220,22 +220,6 @@ TRACKMENOT.TMNSearch = function() {
             deleteTab();
         }
     }									
-						  
-															
-						  
-	 
-
-						  
-									  
-  
-												
-								 
-				   
-						
-				
-						
-		 
-	 
 
     function getTMNTab() {
         debug("Trying to access to the tab: " + tmn_tab_id);
@@ -528,42 +512,7 @@ TRACKMENOT.TMNSearch = function() {
     }
 
 
- //    function readDHSList() {
- //        TMNQueries.dhs = [];
- //        var i = 0;
- //        var req = new XMLHttpRequest();
- //        try {
- //            req.open('GET', "dhs_keywords.json", true);
- //            req.onreadystatechange = function() {
-				  
-											
-	// 			if (req.readyState === 4) {
-	// 				var keywords = JSON.parse(req.responseText).keywords;           
-	// 				for (var cat of keywords) {
-	// 					TMNQueries.dhs[i] = {};
-	// 					TMNQueries.dhs[i].category_name = cat.category_name;
-	// 					TMNQueries.dhs[i].words = [];
-	// 					for (var word of cat.category_words)
-	// 						TMNQueries.dhs[i].words.push(word.name);
-	// 					i++;
-	// 				}
-	// 				return;
-	// 			} 
-												 
-										   
-											  
-																			   
-								  
-				 
- //            }
-					   
-		   
-	// 		req.send();
-	// 	  } catch (ex) {
-	// 		cout("[WARN]  Can not load DHS list: " + ex.message);
-	// 		return
-	// 	 }
-	// }
+
 //Replace the old XHR block with this cleaner Promise-based fetch
 function readDHSList() {
     TMNQueries.dhs = [];
@@ -587,27 +536,6 @@ function readDHSList() {
         });
 }
 
-    // function doRssFetch(feedUrl) {
-    //     if (!feedUrl) return;
-    //     cout("Feed Url: " + feedUrl);
-    //     var req = new XMLHttpRequest();
-    //     try {
-    //         req.open('GET', feedUrl, true);
-    //         req.onreadystatechange = function() {
-    //             if (req.readyState === 4) {
-    //                 var doc = req.responseXML;
-    //                 debug(doc);
-    //                 addRssTitles(doc, feedUrl);
-    //             }
-    //         };
-    //         req.send();
-    //     } catch (ex) {
-    //         cout("[WARN]  doRssFetch(" + feedUrl + ")\n" +
-    //             "  " + ex.message + " | Using defaults...");
-    //         return; // no adds here...
-    //     }
-
-    // }
 	//Replace the XHR logic with fetch() and use the native DOMParser to parse the XML string (Firefox background pages support DOMParser
 	function doRssFetch(feedUrl) {
    		if (!feedUrl) return;
@@ -860,12 +788,6 @@ function readDHSList() {
         if (isBursting()) engine = burstEngine;
         else engine = chooseElt(tmn_engines.list.filter(function (x) {return x.enabled})).id;
         debug('NextSearchScheduled on: ' + engine);
-		// --- OLD LOGIC ---
-        // window.clearTimeout(tmn_errTimeout);
-        // tmn_errTimeout = window.setTimeout(rescheduleOnError, delay * 3);
-        // window.clearTimeout(tmn_searchTimer);
-        // tmn_searchTimer = window.setTimeout(doSearch, delay);
-		// --- NEW MV3 LOGIC ---
 		api.alarms.clear("tmn_errTimeout");
 		api.alarms.clear("tmn_searchTimer");
 
