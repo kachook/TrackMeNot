@@ -127,10 +127,11 @@ TRACKMENOT.TMNSearch = function() {
     var default_engines = {"list":[
         {
 			id: 'google',
-			name: 'Google Search',
-			urlmap: "https://www.google.com/search?hl=en&q=|",
-			enabled: true,
-			regexmap: "^(https?:\/\/[a-z]+\.google\.(co\\.|com\\.)?[a-z]{2,3}\/(search){1}[\?]?.*?[&\?]{1}q=)([^&]*)(.*)$"
+            name: 'Google Search',
+            urlmap: "https://www.google.com/search?q=|",
+            enabled: true,
+            host: "google\.[a-z.]{2,6}$", // MISSING IN OLD CODE
+            regexmap: "^(https?:\/\/[a-z.]*?google\.[a-z.]{2,6}\/search.*?q=)([^&]*)(.*)$"
 		},
         {
             id: 'yahoo',
