@@ -213,37 +213,40 @@ function TMNHideQueries() {
 }
 
 function TMNShowLog(items) {
-    var logs = items.logs_tmn;
- //    var htmlStr = '<table cellspacing=3 id="overlaytext" width="800px" position="relative">';
- //    htmlStr += '<thead><tr align=left>';
- //    htmlStr += '<th>Engine</th>';
- //    htmlStr += '<th>Mode</th>';
- //    htmlStr += '<th>URL</th>';
- //    htmlStr += '<th>Query/Message</th>';
- //    htmlStr += '<th>Date</th>';
- //    htmlStr += '</tr></thead>';
-	// var row = $('<tr>');
-	row.append($('<td>').text(logs[i].query || ''));
-    for (var i = 0; i < 3000 && i < logs.length; i++) {
-        htmlStr += '<tr ';
-        if (logs[i].type === 'ERROR') htmlStr += 'style="color:Red">';
-        if (logs[i].type === 'query') htmlStr += 'style="color:Black">';
-        if (logs[i].type === 'URLmap') htmlStr += 'style="color:Brown">';
-        if (logs[i].type === 'click') htmlStr += 'style="color:Blue">';
-        if (logs[i].type === 'info') htmlStr += 'style="color:Green">';
-        htmlStr += logs[i].engine ? '<td><b>' + logs[i].engine + '</b></td>' : '<td></td>';
-        htmlStr += logs[i].mode ? '<td>' + logs[i].mode + '</td>' : '<td></td>';
-        htmlStr += logs[i].newUrl ? '<td>' + logs[i].newUrl.substring(0, 50) + '</td>' : '<td></td>';
-        htmlStr += logs[i].query ? '<td>' + logs[i].query + '</td>' : '<td></td>';
-        htmlStr += logs[i].date ? '<td>' + logs[i].date + '</td>' : '<td></td>';
+    const logs = items.logs_tmn || [];
+    const $container = $('#tmn_logs_container').empty();
+    const $table = $('<table cellspacing="3" width="100%">');
+    
+    // Add Table Header
+    $table.append('<thead><tr align="left"><th>Engine</th><th>Mode</th><th>URL</th><th>Query/Message</th><th>Date</th></tr></thead>');
+    
+    const $tbody = $('<tbody>');
 
-        htmlStr += '</font></tr>';
+    // Loop through logs (limiting to 1000 for performance)
+    for (var i = 0; i < 1000 && i < logs.length; i++) {
+        const entry = logs[i];
+        const $tr = $('<tr>');
+
+        // Apply styling based on type
+        if (entry.type === 'ERROR') $tr.css('color', 'Red');
+        else if (entry.type === 'query') $tr.css('color', 'Black');
+        else if (entry.type === 'URLmap') $tr.css('color', 'Brown');
+        else if (entry.type === 'click') $tr.css('color', 'Blue');
+        else if (entry.type === 'info') $tr.css('color', 'Green');
+
+        // Build the row safely using .text() to prevent XSS
+        $tr.append($('<td>').append($('<b>').text(entry.engine || '')));
+        $tr.append($('<td>').text(entry.mode || ''));
+        $tr.append($('<td>').text(entry.newUrl ? entry.newUrl.substring(0, 50) : ''));
+        $tr.append($('<td>').text(entry.query || ''));
+        $tr.append($('<td>').text(entry.date || ''));
+
+        $tbody.append($tr);
     }
-    htmlStr += '</table>';
-    //$('#tmn_logs_container').html(htmlStr);
-	$('#tmn_logs_container').append(row);
-	$('#overlay_logs').css("display","block");
-	//window.setTimeout(TMNShowLog, 1000,items);
+
+    $table.append($tbody);
+    $container.append($table);
+    $('#overlay_logs').css("display", "block");
 }
 
 
