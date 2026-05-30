@@ -971,13 +971,13 @@ function readDHSList() {
         tmn_options.enabled= true;
         tmn_options.timeout = 6000;
         tmn_options.burstMode = true;
-        tmn_options.useTab= false;
+        tmn_options.useTab= true;
         tmn_options.use_black_list = true;
 		tmn_options.sim_clicks = false;
         tmn_options.use_dhs_list = false;
         tmn_options.kwBlackList = ['bomb', 'porn', 'pornographie'];
         tmn_options.saveLogs= true;
-        tmn_options.feedList = ['http://www.techmeme.com/index.xml','http://rss.slashdot.org/Slashdot/slashdot'];
+        tmn_options.feedList = ['https://old.reddit.com/r/conspiracy/.rss','http://www.techmeme.com/index.xml','http://rss.slashdot.org/Slashdot/slashdot'];
         tmn_options.disableLogs= false;
         tmn_options.tmn_id = 0;     
     }
